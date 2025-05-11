@@ -12,9 +12,32 @@ p {
   font-size: 18px;
 }
 
-input {
+input, textarea, .char-wrapper {
   font-family: 'Share Tech Mono', monospace !important;
-  font-size: 38px !important;
+  font-size: 20px !important;
+}
+
+.key-form {
+  margin: 0 -5px;
+}
+
+.key-form > div, .key-form > button {
+  margin: 0 5px;
+}
+
+textarea {
+  padding: 16.5px 14px;
+  width: 100%;
+  margin-bottom: 20px;
+  display: block;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-color: rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+}
+
+.key-input {
+  margin-bottom: 10px;
 }
 
 #form {
@@ -31,4 +54,29 @@ main pre {
   background: #eee;
   border-radius: 3px;
   padding: 10px;
+  font-size: 18px;
+  text-wrap: wrap;
+  overflow-wrap: break-word;
+}
+
+.char-roller {
+  padding-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.char-wrapper {
+  width: 10px;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.char-column {
+  position: absolute;
+  transition: all 1s ease-in-out;
+}
+
+.single-char {
+  display: block;
 }

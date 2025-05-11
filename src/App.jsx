@@ -1,74 +1,126 @@
 import './App.css'
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
+
 import TextField from '@mui/material/TextField';
-import { useState } from 'react';
-import { customAlphabet } from 'nanoid';
+import { useEffect, useState } from 'react';
 
-const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+import Chance from 'chance'
+import { TextareaAutosize } from '@mui/base';
+import QRCode from "react-qr-code";
+import useQueryString from 'use-query-string';
 
-function fromBase33(char) {
-  const value = alphabet.indexOf(char) + 1;  // +1 because index starts from 0
-  return value;
-}
+const alphabet = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
 
-function toBase33(num) {
-  let result = '';
-
-  while (num > 0) {
-    const remainder = num % 33;
-    result = alphabet.charAt(remainder) + result;
-    num = Math.floor(num / 33);
-  }
-
-  return result || '1';  // Return '1' if input is zero
-}
-
-function calculateBase33Sum(id) {
-  let sum = 0;
-
-  for (let i = 0; i < id.length; i++) {
-    const char = id[i];
-    sum += fromBase33(char)
-  }
-
-  return sum;
-}
-
-const generate = () => {
-  const nanoid = customAlphabet(alphabet, 12);
-  const baseId = nanoid()
-  console.log('baseId', baseId)
-  const sum = calculateBase33Sum(baseId)
-  console.log('sum', sum)
-  const b33Sum = toBase33(sum)
-  console.log('b33sum', b33Sum)
-  return baseId + b33Sum
-}
+const alphabetChars = alphabet.split('')
 
 export default function App() {
-  const [token, setToken] = useState('');
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [id, setId] = useState(generate());
+  const [key1, setKey1] = useState('');
+  const [key2, setKey2] = useState('');
+  const [cipherText, setCiphertext] = useState('');
+  const [plaintext, setPlaintext] = useState('');
+  const [mode, setMode] = useState(1);
+  const [message, setMessage] = useState('');
+  const [query] = useQueryString(window.location, () => null)
+
+  useEffect( () => {
+    if (query.message) {
+      setCiphertext(decodeURIComponent(query.message))
+    }
+  }, [query])
 
   const handleSubmit = () => {
-    setId(generate())
+    const rand = new Chance(key1 + key2);
+    const decrypted = []
+    for (const char of cipherText) {
+      let index
+      if (alphabet.includes(char)) {
+        index = alphabet.indexOf(char)
+      } else {
+        index = alphabet.indexOf('-')
+      }
+      const increment = rand.integer({ min: 0, max: alphabet.length - 1 });
+      
+      const newIndex = ((index - increment) + alphabet.length) % alphabet.length;
+      
+      decrypted.push(alphabet[newIndex])
+  
+    }
+    setPlaintext(decrypted.join(''))
   }
+
+  const handleEncryptSubmit = () => {
+    const rand = new Chance(key1 + key2);
+    const encrypted = []
+    
+    for (const char of message) {
+      if (alphabet.includes(char)) {
+        const index = alphabet.indexOf(char)
+        const increment = rand.integer({ min: 0, max: alphabet.length - 1 });
+        
+        const newIndex = (index + increment) % alphabet.length;
+        
+        
+        encrypted.push(alphabet[newIndex])
+      }
+    }
+    setCiphertext(encrypted.join(''))
+  }
+
+  const linkUri = 'https://gemini-cipher.replit.app?message=' + encodeURIComponent(cipherText)
+
+
   
   return (
     <main>
-      <h1>Tag33: Not Your Grandma's ID System</h1>
-      <p>Tag33 is a specialized identification system built on a base-33 alphanumeric scheme, utilizing a curated character set of  <code>123456789ABCDEFGHJKLMNPQRSTUVWXYZ</code> for encoding. By excluding the letters 'I' and 'O,' the scheme minimizes the chance of human error, enhancing readability and ease of use. Additionally, the scheme avoids lowercase characters for further simplicity. Each identifier consists of a 12-character string followed by a 2-character checksum, resulting in a 14-character overall length. The identifier's character set allows for 33<sup>12</sup> or approximately 7.4 &times; 10<sup>18</sup> unique IDs,  optimized for both high-capacity and human readability. The checksum is calculated by summing the numerical values of the 12 initial characters in base-33, a sum that is then also represented in base-33 and suffixed to the identifier. This dual-character checksum improves data integrity by offering an error-detection mechanism. Designed with a focus on ease-of-use, high-capacity, error resistance, and straightforward validation, Tag33 aims to meet advanced identification needs in various domains.</p>
-      <div id="form">
-      <div> 
-        <TextField fullWidth required id="outlined-basic" variant="outlined" inputProps={{ style: { textAlign: 'center'}}} value={id} />
-      </div>
-    
+      {mode === 1 &&
       <div>
-        <Button variant="contained" onClick={handleSubmit}>Generate</Button>
+      <div className="key-form" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}> 
+        <TextField className="key-input" variant="outlined" inputProps={{ style: { textAlign: 'center'}}} value={key1} onChange={(e) => setKey1(e.target.value.toUpperCase())} label="Key 1" />
+        <TextField className="key-input" variant="outlined" inputProps={{ style: { textAlign: 'center'}}} value={key2} onChange={(e) => setKey2(e.target.value.toUpperCase())} label="Key 2" />
+        
+          <Button style={{height: 59, paddingLeft: 25, paddingRight: 25}} variant="contained" onClick={handleSubmit}>Decrypt</Button>
       </div>
+      <div className="char-roller">
+        {cipherText.split('').map((cipherChar, idx) => {
+          let offset = alphabetChars.indexOf(cipherChar)
+          if (plaintext) {
+            offset = alphabetChars.indexOf(plaintext[idx])
+          }
+          return (
+          <div className="char-wrapper">
+            <div className="char-column" style={{top: - (offset * 20)}}>
+            {alphabetChars.map(char => {
+              return <span style={{height: 20 }} className="single-char">{char}</span>
+            })}
+            </div>
+          </div>
+            )
+        })}
       </div>
+      
+      </div>}
+
+      {mode === 0 &&
+        <div className=''>
+          <TextareaAutosize fullWidth
+           aria-label="minimum height" minRows={3} value={message} onChange={(e) => setMessage(e.target.value.toUpperCase())} />
+        <div className="key-form" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}> 
+          <TextField className="key-input" variant="outlined" inputProps={{ style: { textAlign: 'center'}}} value={key1} onChange={(e) => setKey1(e.target.value.toUpperCase())} label="Key 1" />
+          <TextField className="key-input" variant="outlined" inputProps={{ style: { textAlign: 'center'}}} value={key2} onChange={(e) => setKey2(e.target.value.toUpperCase())} label="Key 2" />
+
+            <Button style={{height: 59, paddingLeft: 25, paddingRight: 25}} variant="contained" onClick={handleEncryptSubmit}>Encrypt</Button>
+        </div>
+
+          {cipherText && (
+        <pre>
+          {cipherText}
+        </pre>)}
+
+          {cipherText && <QRCode value={linkUri} />}
+        
+        </div>}
+    
+      <a  style={{position: 'absolute', bottom: 34, left: 22 }} href="#" onClick={(e) => e.preventDefault() || setMode(mode ? 0 : 1)}>change mode</a>
     </main>
   )
 }

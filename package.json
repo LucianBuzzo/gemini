@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --port 5173"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +16,10 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.2",
     "@mui/material": "^5.13.3",
-    "nanoid": "^5.0.1"
+    "chance": "^1.1.11",
+    "nanoid": "^5.0.1",
+    "react-qr-code": "^2.0.12",
+    "use-query-string": "^2.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
