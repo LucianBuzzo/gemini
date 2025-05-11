@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="200" height="200" src="https://raw.githubusercontent.com/cerebruminc/yates/master/images/gemini.jpeg">
+  <img width="200" height="200" src="https://raw.githubusercontent.com/LucianBuzzo/gemini/master/images/gemini.jpeg">
 
   <h1>Gemini</h1>
 
