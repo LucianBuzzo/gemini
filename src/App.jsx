@@ -66,7 +66,7 @@ export default function App() {
     setCiphertext(encrypted.join(''))
   }
 
-  const linkUri = 'https://gemini-cipher.replit.app?message=' + encodeURIComponent(cipherText)
+  const linkUri = 'https://lucianbuzzo.github.io/gemini?message=' + encodeURIComponent(cipherText)
 
 
   
@@ -117,6 +117,8 @@ export default function App() {
         </pre>)}
 
           {cipherText && <QRCode value={linkUri} />}
+
+          <a href={linkUri} target="_blank" rel="noopener noreferrer">Share</a>
         
         </div>}
     
