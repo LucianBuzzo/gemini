@@ -118,7 +118,12 @@ export default function App() {
 
           {cipherText && <QRCode value={linkUri} />}
 
-          <a href={linkUri} target="_blank" rel="noopener noreferrer">Share</a>
+
+          {cipherText && (
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10}}>
+              <a href={linkUri} target="_blank" rel="noopener noreferrer">Share</a>
+            </div>
+          )}
         
         </div>}
     
